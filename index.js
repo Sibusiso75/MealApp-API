@@ -14,7 +14,7 @@ app.use(cors({
 }))
 app.use(cookieParser())
 mongoose.connect(process.env.MONGO_DB).then(()=>{
-    console.log("Movie Database connected successfully")
+    console.log("Meal Database connected successfully")
 }).catch((err)=>{
     console.log(err)
 })
