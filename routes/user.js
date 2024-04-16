@@ -63,7 +63,7 @@ router.post("/forgot-password", async (req, res)=>{
       subject:"Reset password",
       html:`<p>Hi ${user.username}</p>
       <p>To reset your password, click the link below.</p>       
-      <a href="http://localhost:5173/resetPassword/${encodedToken}">
+      <a href="https://s-mealrecipes.netlify.app/resetPassword/${encodedToken}">
       Reset password link</a>
       `
     }
@@ -93,8 +93,7 @@ router.post("/reset-password/:token", async (req, res)=>{
      return res.json("Invalid token")}
 })
 
-
-const verifyUser = async(req, res, next)=>{
+const verifyUser = async(req, res)=>{
 try {
   const token = req.cookies.token;
   if(!token){
