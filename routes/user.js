@@ -5,6 +5,9 @@ const nodemailer = require("nodemailer")
 const User= require("../models/User.js")
 const router = express.Router()
 
+router.get("/", (req, res)=>{
+  res.send("Hello world from the server")
+})
 router.post("/register", async (req, res)=>{
     const {username, email, password} = req.body;
     const user = await User.findOne({email})
