@@ -5,7 +5,7 @@ const nodemailer = require("nodemailer")
 const User= require("../models/User.js")
 const router = express.Router()
 const Token = require("../models/Token.js")
-// const crypto = require("crypto")
+const crypto = require("crypto")
 
 router.get("/", (req, res)=>{
   res.send("Hello world from the server")
