@@ -56,7 +56,7 @@ router.post("/register", async (req, res)=>{
 
   return res.json({status:true,message:"Verification link is sent to your email verify your account. Please check it."})
 })
-router.get("/:id/verify/:token", async (req, res)=>{
+router.get("users/:id/verify/:token", async (req, res)=>{
   try {
     const user = await User.findOne({_id:req.params.id})
     if(!user){
