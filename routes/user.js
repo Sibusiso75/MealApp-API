@@ -4,8 +4,6 @@ const jwt = require("jsonwebtoken")
 const nodemailer = require("nodemailer")
 const User= require("../models/User.js")
 const router = express.Router()
-const Token = require("../models/Token.js")
-const crypto = require("crypto")
 
 router.get("/", (req, res)=>{
   res.send("Hello world from the server")
@@ -19,63 +17,14 @@ router.post("/register", async (req, res)=>{
     }
     const hashedPassword = await bcrypt.hash(password, 10)
 
-    user = new User({
+    const newUser = new User({
       username,
       email,
       password:hashedPassword,
     })
-    await user.save()
-    const token = new Token({
-      userId:user._id,
-      token:crypto.randomBytes(32).toString("hex")
-    })
-    await token.save()
-    var transporter = nodemailer.createTransport({
-      service:"gmail",
-      auth:{
-        user:process.env.MYEMAIL, pass:process.env.MEALPASS}
-    })
-    var mailOptions = {
-      from:process.env.MYEMAIL,
-      to:email,
-      subject:"Verify Email",
-      html:`<p>Hi, ${user.username}</p>
-      <p>Verify your account by clicking the link below</p>       
-      <a href="https://s-mealrecipes.netlify.app/users/${user_id}/verify/${token.token}">
-      Verify link</a>
-      `
-    }
-    transporter.sendMail(mailOptions, function(error, info){
-      if(error){
-        console.log(error)
-      }
-      else{
-       return res.json({message:"Email sent"})
-      }
-    })
-
-  return res.json({status:true,message:"Verification link is sent to your email verify your account. Please check it."})
-})
-router.get("users/:id/verify/:token", async (req, res)=>{
-  try {
-    const user = await User.findOne({_id:req.params.id})
-    if(!user){
-      return res.status(400).send({message:"Invalid link"})
-    }
-    const token = await Token.findOne({
-      userId:user_id,
-      token:req.params.token,
-    })
-    if(!token){
-      return res.status(400).send({message:"Invalid link"})
-    }
-    await User.updateOne({_id:user._id, verified:true})
-    await token.remove()
-    res.status(200).send({message:"Email verified successfully"})
-  } catch (error) {
-    res.status(500).send({message:"Internal server error"})
-
-  }
+    await newUser.save()
+  
+  return res.json({status:true})
 })
 
 
@@ -90,35 +39,7 @@ router.post("/login", async(req, res)=>{
    if(!passwordValid){
     return res.json({message:"Password is incorrect"})
    }
-   if(!user.verified){
-    let token = await Token.findOne({userId:user_id})
-    if(!token){
-      var transporter = nodemailer.createTransport({
-        service:"gmail",
-        auth:{
-          user:process.env.MYEMAIL, pass:process.env.MEALPASS}
-      })
-      var mailOptions = {
-        from:process.env.MYEMAIL,
-        to:email,
-        subject:"Verify Email",
-        html:`<p>Hi, ${user.username}</p>
-        <p>Verify your account by clicking the link below</p>       
-        <a href="https://s-mealrecipes.netlify.app/users/${user_id}/verify/${token.token}">
-        Verify link</a>
-        `
-      }
-      transporter.sendMail(mailOptions, function(error, info){
-        if(error){
-          console.log(error)
-        }
-        else{
-         return res.json({message:"Email sent"})
-        }
-      })
-    }
-    return res.json({status:true})
-   }
+   
    const token = jwt.sign({
     username:user.username }, process.env.KEY, {expiresIn:"1h"})
 
